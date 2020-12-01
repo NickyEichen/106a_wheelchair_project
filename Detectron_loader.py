@@ -66,7 +66,6 @@ with torch.no_grad():
         boxes = [out['instances'].pred_boxes.tensor.cpu().numpy() for out in outputs]
         areas = [out['instances'].pred_boxes.area().cpu().numpy() for out in outputs]
 
-
         print(classes)
         print(boxes)
         print(areas)
