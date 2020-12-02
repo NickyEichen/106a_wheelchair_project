@@ -20,7 +20,6 @@ class WheelchairController:
         self._left_castor_angle = math.pi*3/2
         self._right_castor_angle = math.pi*3/2
         self._linear_velocity = 0
-        self._angular_orientation = 0
         self._angular_velocity = 0
 
         #Not currently used, but might be useful if we want to add features.
@@ -32,6 +31,16 @@ class WheelchairController:
         #Update self._ ... for all state variables above
         # Verify that _roll is around the positive x axis and
         #_yaw is around positive y axis where Y AXIS is the direction the wheelchair drives
+        """
+        # Necessary for dynamics calculations
+        self._roll =
+        self._yaw =
+        self._left_castor_angle =
+        self._right_castor_angle =
+        self._linear_velocity =
+        self._angular_velocity = 
+        """
+
         self._up_to_date = False
         return
 
@@ -61,7 +70,7 @@ class WheelchairController:
         else:
             ang_acel = 0
 
-        # Convert acelerations into torques    
+        # Convert acelerations into torques
         return self.calc_torques(lin_acel, ang_acel)
 
 

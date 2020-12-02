@@ -1,28 +1,31 @@
 import numpy as np
 from numpy import cos, sin, sqrt, array
 
-#Default values
-a = 0.2
-b = 0.4
-c = 0.2
-r_c = 0.05
-r_dw = 0.1
-m = 230
-n = 100
-mu_rc = 0.02
-mu_rd = 0.01
-mu_tau = 0.02
+# Default values
+# Origin refers to midpoint between the two drive wheels
+a = 0.195655 # X dist from origin to castor (m)
+b = 0.658    # Y dist from origin to castor (m)
+c = 0.288    # X dist from origin to drive wheel (m)
+r_c = 0.0405 # Dist from center of castor to pivot (m)
+r_dw = 0.176 # Radius of drive wheel (m)
+m = 202      # Mass of wheelchair (kg) (estimated)
+n = 100      # Ratio in stiffness between front and back wheels (estimated)
+mu_rc = 0.004 # Coef of Rolling friction of castor (Value taken as bycicle tire on asphalt)
+mu_rd = 0.004 # Coef of Rolling friction of drive wheel (Value taken as bicycle tire on asphalt)
+mu_tau = 0.0155 # Coef of friction to pivot castor in place - taken as torque
+                # Estimated as 1/2 * thickness of wheel/2 * (Coef of friction = 1)
+Izz = 22 # Taken from mesh model and scaled to match total mass. (N*m^2)
 
-O_x, O_y, O_z = 0, -0.1, 0.25
+O_x, O_y, O_z = 0.00176, -0.18841, 0.21625 # (m) Values taken from COM of mesh body in Unreal
 
-epsilon = 0.03
+epsilon = 0.0   3
 
 def calc(roll, pitch, theta_3, theta_4, v, v_dot, omega, omega_dot, a=a, b=b, c=c, r_c=r_c, r_dw=r_dw, m=m, n=n, epsilon=epsilon, mu_rc=mu_rc, mu_rd=mu_rd, mu_tau=mu_tau,
-         O_x=O_x, o_y = O_y, O_z = O_z):
+         O_x=O_x, o_y = O_y, O_z = O_z, I=Izz):
     theta_pitch = pitch
     theta_roll = roll
-    I = m*(4*c**2 + b**2)/12
     g = 9.8
+    
     a_3 = a + r_c * cos(theta_3)
     a_4 = a + r_c * cos(theta_4)
     b_3 = b - r_c * sin(theta_3)
