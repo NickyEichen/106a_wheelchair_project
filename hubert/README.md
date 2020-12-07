@@ -25,7 +25,7 @@
 
 You're done!
 
-The wheelchair is waiting for torque inputs on `/set_torques` and is publishing lots of stuff (the topics are listed in the server command line window). A sample node.js client is provided but you can use any language you want since you just need to send and post messages with socket.io.
+The wheelchair is waiting for torque inputs on `/set_torques` and is publishing lots of stuff (the topics are listed in the server command line window). A sample node.js client is provided but you can use any language you want since you just need to send and receive messages with socket.io.
 
 i think if you drag in cameras or whatever you can get image data too but idk how to do that if you image publishing doesnt currently exist i can put that in too just tell me
 
