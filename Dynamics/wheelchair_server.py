@@ -36,7 +36,7 @@ def on_drive_cmd(data):
 
 sio.connect('http://localhost:3000')
 
-while (sio.):
+while (True):
     robot.update_states(states)
     left, right = robot.velocity_control(lin_vel, ang_vel, linear_acel, ang_acel)
     sio.emit('/set_torque', {'left': left, 'right': right})
