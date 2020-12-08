@@ -30,3 +30,27 @@ The wheelchair is waiting for torque inputs on `/set_torques` and is publishing 
 i think if you drag in cameras or whatever you can get image data too but idk how to do that if you image publishing doesnt currently exist i can put that in too just tell me
 
 quite frankly the Permobil message server is kind of terrible so maybe i will fix it up. also if the socket stuff is broken (you should be able to tell from the command line) its probably something to do with versioning maybe downgrade your socketio client to 2.0.0
+
+## Some message formats
+Note that [vec3] is a 3-element array. X is forwards, Y is **left**wards, and Z is upwards.
+
+	/caster_angle/left, /caster_angle/right
+	{
+		pitch: [float] degrees
+		roll: [float] degrees
+		yaw: [float] degrees
+	}
+	/odometry/left, /odometry/right
+	{
+		timestamp: [float] seconds
+		value: [float] meters? cm?
+	}
+	/wheel_speed/left, /wheel_speed/right
+	[float] meters/s
+	/imu
+	{
+		acceleration: [vec3] ??
+		gyroscope: [vec3] ??
+		orientation: [quaternion] ??
+		timestamp: [float] seconds
+	}
