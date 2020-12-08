@@ -1,8 +1,9 @@
 
 import wheelchair_math as WC_Math
 import math
+import socketio
 
-class WheelchairController:
+class WheelchairController(socketio.ClientNamespace):
     def __init__(self):
 
         # Driver Control Coefficients
@@ -25,24 +26,32 @@ class WheelchairController:
         #Not currently used, but might be useful if we want to add features.
         self._dynamic_states = {}
 
-        #Set up any listeners / services / other stuff
-
-    def update_states():
+    def update_states(self, states):
         #Update self._ ... for all state variables above
         # Verify that _roll is around the positive x axis and
         #_yaw is around positive y axis where Y AXIS is the direction the wheelchair drives
-        """
         # Necessary for dynamics calculations
-        self._roll =
-        self._yaw =
-        self._left_castor_angle =
-        self._right_castor_angle =
-        self._linear_velocity =
-        self._angular_velocity = 
-        """
-
-        self._up_to_date = False
+        self._roll = states['roll']
+        self._yaw = states['pitch']
+        self._left_castor_angle = states['left_castor_angle']
+        self._right_castor_angle = states['right_castor_angle']
+        self._linear_velocity = states['linear_velocity']
+        self._angular_velocity = states['angular_velocity']
         return
+
+        # All setter functions
+        def on_roll(self, data):
+            self._roll = data
+        def on_pitch(self, data):
+            self._pitch = data
+        def on_left_castor_angle(self, data):
+            self._left_castor_angle = data
+        def on_right_castor_angle(self, data):
+            self._right_castor_angle = data
+        def on_linear_velocity(self, data):
+            self._linear_velocity = data
+        def on_angular_velocity(self, data):
+            self._angular_velocity = data
 
     def calc_torques(self, linear_acel, angular_acel):
         self._dynamic_states = WC_Math.calc(self._roll, self._pitch, self._left_castor_angle, self._right_castor_angle,
@@ -73,6 +82,12 @@ class WheelchairController:
         # Convert acelerations into torques
         return self.calc_torques(lin_acel, ang_acel)
 
+    def drive(self, ):
+
+
+sio = socketio.Client()
+sio.connect("http://localhost:3000")
+sio.register_namespace(MyCustomNamespace(''))
 
 if __name__ == "__main__":
     robot = WheelchairController()
