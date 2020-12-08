@@ -7,7 +7,7 @@ socket.on('connect', ()=>{
 	console.log("connected to message server!");
 
 	//Tells the server you want messages on "/left_caster_angle". You need to pass an array.
-	socket.emit("subscribe", ["/left_caster_angle"]);
+	socket.emit("subscribe", ["/caster_angle/left"]);
 
 	//this just loops once per second
 	setInterval(()=>{
@@ -19,7 +19,7 @@ socket.on('connect', ()=>{
 });
 
 //whenever you receive that kind of message, the callback is executed.
-socket.on('/left_caster_angle', (data)=>{
+socket.on('/caster_angle/left', (data)=>{
 
 	//javascript will magically print the whole object out so you can use this script to figure out the message formats if you want
 	console.log(data);
