@@ -25,23 +25,17 @@ class WheelchairController:
         #Not currently used, but might be useful if we want to add features.
         self._dynamic_states = {}
 
-        #Set up any listeners / services / other stuff
-
-    def update_states():
+    def update_states(self, states):
         #Update self._ ... for all state variables above
         # Verify that _roll is around the positive x axis and
         #_yaw is around positive y axis where Y AXIS is the direction the wheelchair drives
-        """
         # Necessary for dynamics calculations
-        self._roll =
-        self._yaw =
-        self._left_castor_angle =
-        self._right_castor_angle =
-        self._linear_velocity =
-        self._angular_velocity = 
-        """
-
-        self._up_to_date = False
+        self._roll = states['roll']
+        self._yaw = states['pitch']
+        self._left_castor_angle = states['left_castor_angle']
+        self._right_castor_angle = states['right_castor_angle']
+        self._linear_velocity = states['linear_velocity']
+        self._angular_velocity = states['angular_velocity']
         return
 
     def calc_torques(self, linear_acel, angular_acel):
@@ -72,8 +66,3 @@ class WheelchairController:
 
         # Convert acelerations into torques
         return self.calc_torques(lin_acel, ang_acel)
-
-
-if __name__ == "__main__":
-    robot = WheelchairController()
-    print(robot.calc_torques(1, 0))
