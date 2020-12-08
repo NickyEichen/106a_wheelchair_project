@@ -1,9 +1,8 @@
 
 import wheelchair_math as WC_Math
 import math
-import socketio
 
-class WheelchairController(socketio.ClientNamespace):
+class WheelchairController:
     def __init__(self):
 
         # Driver Control Coefficients
@@ -39,20 +38,6 @@ class WheelchairController(socketio.ClientNamespace):
         self._angular_velocity = states['angular_velocity']
         return
 
-        # All setter functions
-        def on_roll(self, data):
-            self._roll = data
-        def on_pitch(self, data):
-            self._pitch = data
-        def on_left_castor_angle(self, data):
-            self._left_castor_angle = data
-        def on_right_castor_angle(self, data):
-            self._right_castor_angle = data
-        def on_linear_velocity(self, data):
-            self._linear_velocity = data
-        def on_angular_velocity(self, data):
-            self._angular_velocity = data
-
     def calc_torques(self, linear_acel, angular_acel):
         self._dynamic_states = WC_Math.calc(self._roll, self._pitch, self._left_castor_angle, self._right_castor_angle,
                             self._linear_velocity, linear_acel, self._angular_velocity, angular_acel)
@@ -81,14 +66,3 @@ class WheelchairController(socketio.ClientNamespace):
 
         # Convert acelerations into torques
         return self.calc_torques(lin_acel, ang_acel)
-
-    def drive(self, ):
-
-
-sio = socketio.Client()
-sio.connect("http://localhost:3000")
-sio.register_namespace(MyCustomNamespace(''))
-
-if __name__ == "__main__":
-    robot = WheelchairController()
-    print(robot.calc_torques(1, 0))
