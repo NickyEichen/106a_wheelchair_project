@@ -56,3 +56,22 @@ Note that [vec3] is a 3-element array. X is forwards, Y is **left**wards, and Z 
 		orientation: [quaternion] ??
 		timestamp: [float] seconds
 	}
+
+## Record and Playback
+You can record messages on a topic to a file and play it back by sending the following messages to the server:
+
+	socket_emit("record", [topic, duration, filename])
+	socket_emit("play", filename)
+
+Example usage:
+	
+	//this records for 5 seconds and saves the recording serverside to "recordings/sample.txt"
+	socket_emit("record", ["/caster_angle/left", 5000, "sample.txt"])
+
+	//wait a while
+
+	socket_emit("play", "recordings/sample.txt")
+
+
+Note that the recordings directory is not tracked by git to avoid clutter so put your saved recordings somewhere else if you want to push them.
+	
