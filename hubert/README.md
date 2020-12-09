@@ -16,11 +16,13 @@
 
 5. Reopen the UE4 project. It will build the new files. If this fails try installing .NET Framework Developer Pack https://dotnet.microsoft.com/download/visual-studio-sdks
 
-6. Drag a `Content/Blueprints/F5-Complete` and a `roshi Content/DataCollector/BP_CaptureActor` into the scene. Set the `Physics Actor` attribute of the `BP_CaptureActor` to the `F5-Complete` under Details to the right.
+6. Select "View Options" at the bottom-right and tick "Show Plugin Content".
 
-7. Install Node.js and run `server.js`. If you don't have the socketio dependency install npm package manager and run `npm install` in the command line in the `hubert/` directory.
+7. Drag a `Content/Blueprints/F5-Complete` and a `roshi Content/DataCollector/BP_CaptureActor` into the scene. Set the `Physics Actor` attribute of the `BP_CaptureActor` to the `F5-Complete` under Details to the right.
 
-8. Run the UE4 simulation.
+8. Install Node.js and run `server.js`. If you don't have the socketio dependency install npm package manager and run `npm install` in the command line in the `hubert/` directory.
+
+9. Run the UE4 simulation.
 
 
 You're done!
@@ -54,3 +56,22 @@ Note that [vec3] is a 3-element array. X is forwards, Y is **left**wards, and Z 
 		orientation: [quaternion] ??
 		timestamp: [float] seconds
 	}
+
+## Record and Playback
+You can record messages on a topic to a file and play it back by sending the following messages to the server:
+
+	socket_emit("record", [topic, duration, filename])
+	socket_emit("play", filename)
+
+Example usage:
+	
+	//this records for 5 seconds and saves the recording serverside to "recordings/sample.txt"
+	socket_emit("record", ["/caster_angle/left", 5000, "sample.txt"])
+
+	//wait a while
+
+	socket_emit("play", "recordings/sample.txt")
+
+
+Note that the recordings directory is not tracked by git to avoid clutter so put your saved recordings somewhere else if you want to push them.
+	

@@ -1,138 +1,209 @@
+const fs = require('fs');
+const fsp = fs.promises;
+const readline = require('readline');
+
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const util = require('util');
 const port = 3000;
-const clients = [];  //track connected clients
 
 const Emitter = require('events').EventEmitter;
 const emit = Emitter.prototype.emit;
 
-const subscriptions = {};
-
-const subscriptionEvent = "subscribe";
-const unsubscriptionEvent = "unsubscribe";
+const clients = new Set();
+const subscriptions = new Map();
 
 //Server Web Client
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
+	res.sendFile(__dirname + '/index.html');
 });
 
-function process_subscription(sid, subscription) {
-  if (subscription) {
-    let topics = Array.isArray(subscription) ? subscription : Object.keys(subscription);
-    topics.forEach((t) => {
-      if (!(t in subscriptions)) {
-        subscriptions[t] = [];
-      }
-      if (subscriptions[t].indexOf(sid) === -1) {
-        subscriptions[t].push(sid);
-      }
-    });
-  }
+const EVENTS = {
+	SUBSCRIBE: "subscribe",
+	UNSUBSCRIBE: "unsubscribe",
+	RECORD: "record",
+	PLAY: "play"
 }
 
-function unsubscribe_topic(topic, sid) {
-  if (topic in subscriptions) {
-    const index = subscriptions[topic].indexOf(sid);
-    if (index !== -1) {
-      subscriptions.splice(index, 1);
-    }
-  }
+
+function onSubscribe(id, topics) {
+	console.log(id, 'subscription received:', topics);
+	if (typeof topics == "string"){
+		topics = [topics];	  
+	}
+	if(Symbol.iterator in Object(topics)){
+		for(let t of topics){
+			if(typeof t === "string"){
+				if(!subscriptions.has(t)){
+					subscriptions.set(t, new Set());
+				}
+				subscriptions.get(t).add(id);
+			}
+		}
+	}
 }
 
-function usubscribe_all(sid) {
-  for (const [topic, subscribers] of Object.entries(subscriptions)) {
-    const index = subscribers.indexOf(sid);
-    if (index !== -1) {
-      subscribers.splice(index, 1);
-    }
-  }
+function onUnsubscribe(id, topics) {
+	console.log(id, 'unsubscription received:', topics);
+	if(!topics){
+		topics = subscriptions.keys();
+	}
+	if(typeof topics == "string"){
+		topics = [topics];	  
+	}
+	if(Symbol.iterator in Object(topics)){
+		for(let t of topics){
+			if(typeof t === "string"){
+				if(!subscriptions.has(t)){
+					subscriptions.set(t, new Set());
+				}
+				subscriptions.get(t).delete(id);
+			}
+		}
+	}
 }
 
-function process_unsubscription(sid, subscription) {
-  if (subscription) {
-    let topics = Array.isArray(subscription) ? subscription : Object.keys(subscription);
-    if (topics.length) {
-      topics.forEach((t) => {
-        unsubscribe_topic(t, sid);
-      });
-    } else {
-      usubscribe_all(sid);
-    }
-  } else {
-    usubscribe_all(sid);
-  }
+const RECORDER = new Emitter();
+
+async function onRecord(id, msg){
+	const topic = msg[0];
+	const duration = msg[1];
+	const filename = msg[2];
+
+	console.log("now recording on " + topic);
+
+	await fsp.mkdir("recordings").catch(()=>{});
+	await fsp.unlink("recordings/" + filename).catch(()=>{});
+	const fd = await fsp.open("recordings/" + filename, "ax");
+	if(!fd){
+		console.log("error: could not open file for appending");
+		return;
+	}
+	await fsp.appendFile(fd, topic + "\n");
+	
+
+	const cb = async (data) => {
+		const obj = {time: Date.now(), data: data};
+		await fsp.appendFile(fd, JSON.stringify(obj) + "\n");
+	}
+	fsp.appendFile(fd, Date.now() + "\n");
+	RECORDER.on(topic, cb)
+
+	setTimeout(async ()=>{
+		RECORDER.off(topic, cb);
+		await fd.close();
+
+		console.log("finished recording on " + topic)
+	}, duration);
+
+}
+
+async function onPlay(id, filename){
+	const fileStream = fs.createReadStream(filename);
+	const rl = readline.createInterface({
+		input: fileStream,
+		crlfDelay: Infinity
+	});
+
+	if(!rl){
+		console.log("error: could not open file for reading");
+		return;
+	}
+
+	let playstart = null;
+	let recstart = null;
+	let counter = 0;
+	let topic = null;
+
+	for await (const line of rl) {
+		if(counter === 0){
+			topic = line;
+		}
+		else if(counter === 1){
+			recstart = Number(line);
+			playstart = Date.now();
+			console.log("now playing back on " + topic)
+		}
+		else{
+			const data = JSON.parse(line);
+			const delta = (data.time - recstart) - (Date.now() - playstart);
+			await(new Promise((resolve)=>{setTimeout(resolve, delta)}));
+			handleMsg(topic, data.data, false);
+		}
+		counter++;
+	}
+	console.log("finished playback on " + topic)
+}
+
+function handleMsg(topic, msg, recorded = true){
+	if (Object.entries(EVENTS).indexOf(topic) === -1) {
+		if(recorded) {
+			RECORDER.emit(topic, msg);
+		}
+		//console.log('received message type:', topic);
+		if (!subscriptions.has(topic)) {
+			console.log('Adding', topic, 'to list of known topics.');
+			// add it to our list of known topics
+			subscriptions.set(topic, new Set());
+		}
+		if (subscriptions.get(topic).size) {
+			//console.log('replaying message ' + topic + " " + msg);
+			for(let id of subscriptions.get(topic)){
+				if (clients.has(id)) {
+					// console.log('  to', id);
+					io.to(id).emit(topic, msg);
+				} else {
+					console.log('==== BUG: trying to replay to socket', id,
+						'that does not exist, removing from subscriber list!');
+					onUnsubscribe(id);
+				}
+			}
+		}
+	}
 }
 
 //When a client connects, bind each desired event to the client socket
 io.on('connection', socket =>{
-  //track connected clients via log
-  clients.push(socket.id);
-  const clientConnectedMsg = 'User connected ' + util.inspect(socket.id) + ', total: ' + clients.length;
-  console.log(clientConnectedMsg);
-  console.log('entering room');
-  socket.join('chat_room');
+	//track connected clients via log
+	clients.add(socket.id);
 
-  //track disconnected clients via log
-  socket.on('disconnect', ()=>{
-    const index = clients.indexOf(socket.id);
-    if (index !== -1) {
-      clients.splice(index, 1);
-    }
-    // unsubscribe this client from everything
-    usubscribe_all(socket.id);
-    const clientDisconnectedMsg = 'User disconnected ' + util.inspect(socket.id) + ', total: ' + clients.length;
-    console.log(clientDisconnectedMsg);
-  })
+	const clientConnectedMsg = 'User connected ' + util.inspect(socket.id) + ', total: ' + clients.size;
+	console.log(clientConnectedMsg);
 
-  // handle (un-)subscribe events from the client
-  socket.on(subscriptionEvent, msg =>{
-    console.log(socket.id, 'subscription received:', msg);
-    process_subscription(socket.id, msg);
-  });
-  socket.on(unsubscriptionEvent, msg =>{
-    console.log(socket.id, 'unsubscription received:', msg);
-    process_unsubscription(socket.id, msg);
-  });
+	socket.join('chat_room');
 
-  // allow the use of wildcard "*" events so we don't have to
-  // explicitly manage subscription names in this file
-  var onevent = socket.onevent;
-  socket.onevent = function (packet) {
-    var args = packet.data || [];
-    onevent.call (this, packet);    // original call
-    emit.apply   (this, ["*"].concat(args));      // additional call to catch-all
-  };
+	//track disconnected clients via log
+	socket.on('disconnect', ()=>{
+		clients.delete(socket.id);
+		// unsubscribe this client from everything
+		onUnsubscribe(socket.id);
 
-  // handle all topic replay (subscriptions) here using the new
-  // wildcard event:
-  socket.on("*", (topic, msg) => {
-    if (topic !== subscriptionEvent && topic !== unsubscriptionEvent) {
-      //console.log('received message type:', topic);
-      if (!(topic in subscriptions)) {
-        console.log('Adding', topic, 'to list of known topics.');
-        // add it to our list of known topics
-        subscriptions[topic] = [];
-      }
-      if (subscriptions[topic].length) {
-        console.log('replaying message ' + topic + " " + msg);
-        subscriptions[topic].forEach((sid) => {
-          if (clients.indexOf(sid) !== -1) {
-            // console.log('  to', sid);
-            io.to(sid).emit(topic, msg);
-          } else {
-            console.log('==== BUG: trying to replay to socket', sid,
-                        'that does not exist, removing from subscriber list!');
-            unsubscribe_topic(topic, sid);
-          }
-        });
-      }
-    }
-  });
+		const clientDisconnectedMsg = 'User disconnected ' + util.inspect(socket.id) + ', total: ' + clients.size;
+		console.log(clientDisconnectedMsg);
+	})
+
+	// handle (un-)subscribe events from the client
+	socket.on(EVENTS.SUBSCRIBE, (msg)=>{onSubscribe(socket.id, msg)});
+	socket.on(EVENTS.UNSUBSCRIBE, (msg)=>{onUnsubscribe(socket.id, msg)});
+	socket.on(EVENTS.RECORD, (msg)=>{onRecord(socket.id, msg)});
+	socket.on(EVENTS.PLAY, (msg)=>{onPlay(socket.id, msg)});
+
+	// allow the use of wildcard "*" events so we don't have to
+	// explicitly manage subscription names in this file
+	const onevent = socket.onevent;
+	socket.onevent = function (packet) {
+		let args = packet.data || [];
+		onevent.call (this, packet);    // original call
+		emit.apply   (this, ["*"].concat(args));      // additional call to catch-all
+	};
+
+	// handle all topic replay (subscriptions) here using the new		
+	// wildcard event:
+	socket.on("*", handleMsg);
 });
 
 //Start the Server
 http.listen(port, () => {
-  console.log('listening on *:' + port);
+	console.log('listening on *:' + port);
 });
