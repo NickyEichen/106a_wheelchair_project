@@ -67,11 +67,14 @@ function onUnsubscribe(id, topics) {
 const RECORDER = new Emitter();
 
 async function onRecord(id, msg){
-	const topic = msg[0];
+	let topics = msg[0];
+	if(typeof topics == "string"){
+		topics = [topics];	  
+	}
 	const duration = msg[1];
 	const filename = msg[2];
 
-	console.log("now recording on " + topic);
+	console.log("now recording on " + topics);
 
 	await fsp.mkdir("recordings").catch(()=>{});
 	await fsp.unlink("recordings/" + filename).catch(()=>{});
@@ -80,27 +83,28 @@ async function onRecord(id, msg){
 		console.log("error: could not open file for appending");
 		return;
 	}
-	await fsp.appendFile(fd, topic + "\n");
-	
 
 	const cb = async (data) => {
-		const obj = {time: Date.now(), data: data};
-		await fsp.appendFile(fd, JSON.stringify(obj) + "\n");
+		await fsp.appendFile(fd, JSON.stringify(data) + "\n");
 	}
 	fsp.appendFile(fd, Date.now() + "\n");
-	RECORDER.on(topic, cb)
+
+	for(let t of topics){
+		RECORDER.on(t, cb);
+	}
 
 	setTimeout(async ()=>{
-		RECORDER.off(topic, cb);
+		for(let t of topics){
+			RECORDER.off(t, cb);
+		}
 		await fd.close();
 
-		console.log("finished recording on " + topic)
+		console.log("finished recording on " + topics)
 	}, duration);
-
 }
 
-async function onPlay(id, filename){
-	const fileStream = fs.createReadStream(filename);
+async function onPlay(id, path){
+	const fileStream = fs.createReadStream(path);
 	const rl = readline.createInterface({
 		input: fileStream,
 		crlfDelay: Infinity
@@ -114,32 +118,28 @@ async function onPlay(id, filename){
 	let playstart = null;
 	let recstart = null;
 	let counter = 0;
-	let topic = null;
 
 	for await (const line of rl) {
 		if(counter === 0){
-			topic = line;
-		}
-		else if(counter === 1){
 			recstart = Number(line);
 			playstart = Date.now();
-			console.log("now playing back on " + topic)
+			console.log("now playing back file " + path)
 		}
 		else{
 			const data = JSON.parse(line);
 			const delta = (data.time - recstart) - (Date.now() - playstart);
 			await(new Promise((resolve)=>{setTimeout(resolve, delta)}));
-			handleMsg(topic, data.data, false);
+			handleMsg(data.topic, data.data, false);
 		}
 		counter++;
 	}
-	console.log("finished playback on " + topic)
+	console.log("finished playback on file " + path)
 }
 
 function handleMsg(topic, msg, recorded = true){
 	if (Object.entries(EVENTS).indexOf(topic) === -1) {
 		if(recorded) {
-			RECORDER.emit(topic, msg);
+			RECORDER.emit(topic, {topic: topic, time: Date.now(), data: msg});
 		}
 		//console.log('received message type:', topic);
 		if (!subscriptions.has(topic)) {

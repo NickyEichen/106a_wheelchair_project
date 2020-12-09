@@ -60,13 +60,13 @@ Note that [vec3] is a 3-element array. X is forwards, Y is **left**wards, and Z 
 ## Record and Playback
 You can record messages on a topic to a file and play it back by sending the following messages to the server:
 
-	socket_emit("record", [topic, duration, filename])
+	socket_emit("record", [[topics], duration, filename])
 	socket_emit("play", filename)
 
 Example usage:
 	
 	//this records for 5 seconds and saves the recording serverside to "recordings/sample.txt"
-	socket_emit("record", ["/caster_angle/left", 5000, "sample.txt"])
+	socket_emit("record", [["/caster_angle/left"], 5000, "sample.txt"])
 
 	//wait a while
 

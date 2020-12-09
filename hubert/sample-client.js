@@ -17,10 +17,10 @@ socket.on('connect', ()=>{
 		socket.emit("/set_torques", [100,100]);
 	}, 1000);
 
-	socket.emit("record", ["/caster_angle/left", 5000, "casterangleleft.txt"])
+	socket.emit("record", [["/caster_angle/left", "/caster_angle/right"], 5000, "sample.txt"])
 
 	setTimeout(()=>{
-		socket.emit("play", "recordings/casterangleleft.txt");
+		socket.emit("play", "recordings/sample.txt");
 	}, 10000)
 });
 
