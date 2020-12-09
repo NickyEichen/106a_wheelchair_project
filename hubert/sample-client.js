@@ -16,6 +16,12 @@ socket.on('connect', ()=>{
 		//this takes an array, socketio packages it up for you. It arrives to the simulation as a JSON string.
 		socket.emit("/set_torques", [100,100]);
 	}, 1000);
+
+	socket.emit("record", ["/caster_angle/left", 5000, "casterangleleft.txt"])
+
+	setTimeout(()=>{
+		socket.emit("play", "recordings/casterangleleft.txt");
+	}, 10000)
 });
 
 //whenever you receive that kind of message, the callback is executed.
