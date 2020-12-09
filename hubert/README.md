@@ -16,11 +16,13 @@
 
 5. Reopen the UE4 project. It will build the new files. If this fails try installing .NET Framework Developer Pack https://dotnet.microsoft.com/download/visual-studio-sdks
 
-6. Drag a `Content/Blueprints/F5-Complete` and a `roshi Content/DataCollector/BP_CaptureActor` into the scene. Set the `Physics Actor` attribute of the `BP_CaptureActor` to the `F5-Complete` under Details to the right.
+6. Select "View Options" at the bottom-right and tick "Show Plugin Content".
 
-7. Install Node.js and run `server.js`. If you don't have the socketio dependency install npm package manager and run `npm install` in the command line in the `hubert/` directory.
+7. Drag a `Content/Blueprints/F5-Complete` and a `roshi Content/DataCollector/BP_CaptureActor` into the scene. Set the `Physics Actor` attribute of the `BP_CaptureActor` to the `F5-Complete` under Details to the right.
 
-8. Run the UE4 simulation.
+8. Install Node.js and run `server.js`. If you don't have the socketio dependency install npm package manager and run `npm install` in the command line in the `hubert/` directory.
+
+9. Run the UE4 simulation.
 
 
 You're done!
