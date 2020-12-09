@@ -33,6 +33,11 @@ i think if you drag in cameras or whatever you can get image data too but idk ho
 
 quite frankly the Permobil message server is kind of terrible so maybe i will fix it up. also if the socket stuff is broken (you should be able to tell from the command line) its probably something to do with versioning maybe downgrade your socketio client to 2.0.0
 
+## Common problems
+* If the wheelchair is flying around, try deleting the `Config/` folder and replacing it with Permobil's `Config/` folder.
+* If SocketIO in python can't connect to the server and says something about an "OPEN" packet, downgrade `python-socketio` to `5.0.0`.
+
+
 ## Some message formats
 Note that [vec3] is a 3-element array. X is forwards, Y is **left**wards, and Z is upwards.
 
