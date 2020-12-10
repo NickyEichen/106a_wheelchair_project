@@ -6,6 +6,11 @@ import matplotlib.pyplot as plt
 "The path planner default trajectory finder is a hermite polynomial function"
 # point will be given as [x,y, exit angle]
 # so points will be [[x,y, exit angle],[x,y, exit angle],[x,y, exit angle]] etc.
+# need to install pip3 install 'pybind11>=2.2'
+# pip3 install robotpy-pathfinder
+# pip 3install -U matplotlib
+
+
 def createPoints(points):
     list = []
     for p in points:
