@@ -10,7 +10,7 @@ points = [
     pf.Waypoint(0, 0, 0),                       # Waypoint @ x=0, y=0,   exit angle=0 radians
 ]
 # points = [pf.Waypoint(-4, -1, math.radians(-45.0)), pf.Waypoint(-2, -2, 0), pf.Waypoint(0, 0, 0),]
-info, trajectory = pf.generate(points, pf.FIT_HERMITE_CUBIC, pf.SAMPLES_HIGH,dt=0.05,max_velocity=1.7,max_acceleration=2.0,max_jerk=60.0)
+info, trajectory = pf.generate(points, pf.FIT_HERMITE_CUBIC, pf.SAMPLES_HIGH, dt=0.05,max_velocity=1.7,max_acceleration=2.0,max_jerk=60.0)
 
 
 modifier = pf.modifiers.TankModifier(trajectory).modify(0.5) #0.5 is the width of the wheelchair base need to change
