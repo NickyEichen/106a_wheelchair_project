@@ -137,7 +137,7 @@ async function onPlay(id, path){
 }
 
 function handleMsg(topic, msg, recorded = true){
-	if (Object.entries(EVENTS).indexOf(topic) === -1) {
+	if (Object.values(EVENTS).indexOf(topic) === -1) {
 		if(recorded) {
 			RECORDER.emit(topic, {topic: topic, time: Date.now(), data: msg});
 		}

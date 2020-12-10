@@ -29,12 +29,16 @@ You're done!
 
 The wheelchair is waiting for torque inputs on `/set_torques` and is publishing lots of stuff (the topics are listed in the server command line window). A sample node.js client is provided but you can use any language you want since you just need to send and receive messages with socket.io.
 
-i think if you drag in cameras or whatever you can get image data too but idk how to do that if you image publishing doesnt currently exist i can put that in too just tell me
+Image data seems to be working if you use `BP_F5_Cameras` (which is a subclass of `BP_CaptureActor`), ask Anikait for more details.
 
-quite frankly the Permobil message server is kind of terrible so maybe i will fix it up. also if the socket stuff is broken (you should be able to tell from the command line) its probably something to do with versioning maybe downgrade your socketio client to 2.0.0
+
+## Common problems
+* If the wheelchair is flying around, try deleting the `Config/` folder and replacing it with Permobil's `Config/` folder.
+* If SocketIO in python can't connect to the server and says something about an "OPEN" packet, downgrade `python-socketio` to `5.0.0`.
+
 
 ## Some message formats
-Note that [vec3] is a 3-element array. X is forwards, Y is **left**wards, and Z is upwards.
+Note that a `[vec3]` is a 3-element float array `[X, Y, Z]`. X is forwards, Y is **left**wards, and Z is upwards.
 
 	/caster_angle/left, /caster_angle/right
 	{
@@ -58,9 +62,9 @@ Note that [vec3] is a 3-element array. X is forwards, Y is **left**wards, and Z 
 	}
 
 ## Record and Playback
-You can record messages on a topic to a file and play it back by sending the following messages to the server:
+You can record messages on a set topic to a file and play it back by sending the following messages to the server:
 
-	socket_emit("record", [[topics], duration, filename])
+	socket_emit("record", [[topic1, topic2, ... ], duration, filename])
 	socket_emit("play", filename)
 
 Example usage:
@@ -73,5 +77,5 @@ Example usage:
 	socket_emit("play", "recordings/sample.txt")
 
 
-Note that the recordings directory is not tracked by git to avoid clutter so put your saved recordings somewhere else if you want to push them.
+Note that the `recordings/` directory is not tracked by git to avoid clutter, so put your saved recordings somewhere else if you want to push them. Playing a recording broadcasts the messages to every client currently connected.
 	
