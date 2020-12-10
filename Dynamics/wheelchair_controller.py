@@ -66,3 +66,6 @@ class WheelchairController:
 
         # Convert acelerations into torques
         return self.calc_torques(lin_acel, ang_acel)
+
+    def calc_speed(self, left_speed, right_speed):
+        return WC_Math.calc_velocities(left_speed, right_speed)

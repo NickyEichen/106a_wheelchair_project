@@ -1,21 +1,17 @@
 import socketio
 
 sio = socketio.Client()
-sio.connect('http://localhost:3000')
 
 d = None
 
-@sio.on('/camera_info')
-def on_camera_info(data):
-    d = data
-
 @sio.event
 def connect():
-    sio.emit("subscribe", ["/camera_info"])
+    sio.emit("subscribe", ["/caster_angle/left"])
     print('Connected successfully')
 
-
-
-while True:
+@sio.on('/caster_angle/left')
+def on_camera_info(data):
+    d = data
     print(d)
-    sleep(1)
+
+sio.connect('http://localhost:3000')

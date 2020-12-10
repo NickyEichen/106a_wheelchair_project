@@ -56,6 +56,11 @@ def calc(roll, pitch, theta_3, theta_4, v, v_dot, omega, omega_dot, a=a, b=b, c=
          'R4x': R_4x, 'R4y': R_4y, 'a1': alpha_1, 'a2': alpha_2, 'torque_1': torque_1, 'torque_2': torque_2}
     return d
 
+def calc_velocities(left_wheel_speed, right_wheel_speed):
+    lin_vel = (left_wheel_speed + right_wheel_speed) / 2
+    ang_vel = (left_wheel_speed - right_wheel_speed) / (2*c)
+    return lin_vel, ang_vel
+
 def calcsimp(v, vdot, o, odot, t3=1.5, t4=1.5):
     return calc(0, 0, t3*np.pi, t4*np.pi, v, vdot, o, odot)
 
