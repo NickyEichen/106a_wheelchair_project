@@ -6,13 +6,13 @@ class WheelchairController:
     def __init__(self):
 
         # Driver Control Coefficients
-        self._velcontrol_lin_Kv = 0.1
-        self._velcontrol_ang_Kv = 0.1
+        self._velcontrol_lin_Kv = -0.4
+        self._velcontrol_ang_Kv = -0.4
 
-        self._max_linear_vel = 3
-        self._max_angular_vel = 2.5
-        self._max_linear_acel = 1
-        self._max_angular_acel = 0.5
+        self._max_linear_vel = 10
+        self._max_angular_vel = 10
+        self._max_linear_acel = 8
+        self._max_angular_acel = 5
 
 
         self._roll = 0
@@ -65,6 +65,7 @@ class WheelchairController:
             ang_acel = 0
 
         # Convert acelerations into torques
+        print("Acelerations: %.2f, %.2f" %(lin_acel, ang_acel))
         return self.calc_torques(lin_acel, ang_acel)
 
     def calc_speed(self, left_speed, right_speed):
