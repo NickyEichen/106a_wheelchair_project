@@ -9,10 +9,10 @@
 	Raytracing Disabled
 	Desktop/Console
 	No Starter Content
-	
+
 3. Copy the `Config/`, `Content/`, `Plugins/` folders from Permobil's simulation zip into the project directory. This overwrites `DefaultEngine.ini`
 
-4. Copy the `Content/`, `Plugins/` folders from `hubert/` into the project directory. This overwrites two files. 
+4. Copy the `Content/`, `Plugins/` folders from `hubert/` into the project directory. This overwrites two files.
 
 5. Reopen the UE4 project. It will build the new files. If this fails try installing .NET Framework Developer Pack https://dotnet.microsoft.com/download/visual-studio-sdks
 
@@ -41,11 +41,7 @@ Image data seems to be working if you use `BP_F5_Cameras` (which is a subclass o
 Note that a `[vec3]` is a 3-element float array `[X, Y, Z]`. X is forwards, Y is **left**wards, and Z is upwards.
 
 	/caster_angle/left, /caster_angle/right
-	{
-		pitch: [float] degrees
-		roll: [float] degrees
-		yaw: [float] degrees
-	}
+	[float] radians
 	/odometry/left, /odometry/right
 	{
 		timestamp: [float] seconds
@@ -60,6 +56,19 @@ Note that a `[vec3]` is a 3-element float array `[X, Y, Z]`. X is forwards, Y is
 		orientation: [quaternion] ??
 		timestamp: [float] seconds
 	}
+	/orientation
+	{
+		roll: [float] radians
+		pitch: [float] radians
+		yaw: [float] radians
+	}
+	/drive_cmd
+	{
+		linear_velocity: [float] m/s
+		linear_aceleration: [float] m/s**2
+		angular_velocity: [float] rad/s
+		angular_aceleration: [float] rad/s**2
+	}
 
 ## Record and Playback
 You can record messages on a set topic to a file and play it back by sending the following messages to the server:
@@ -68,7 +77,7 @@ You can record messages on a set topic to a file and play it back by sending the
 	socket_emit("play", filename)
 
 Example usage:
-	
+
 	//this records for 5 seconds and saves the recording serverside to "recordings/sample.txt"
 	socket_emit("record", [["/caster_angle/left"], 5000, "sample.txt"])
 
@@ -78,4 +87,3 @@ Example usage:
 
 
 Note that the `recordings/` directory is not tracked by git to avoid clutter, so put your saved recordings somewhere else if you want to push them. Playing a recording broadcasts the messages to every client currently connected.
-	

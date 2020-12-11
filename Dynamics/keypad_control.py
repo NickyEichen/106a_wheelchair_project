@@ -5,12 +5,15 @@ from time import sleep
 sio = socketio.Client()
 
 v = 5
-t = 3
+t = -3
+
+exit = False
 
 @sio.event
 def connect():
     print("connected successfully")
-    while True:
+    exit = False
+    while not exit:
         linvel = 0
         angvel = 0
         if keyboard.is_pressed('w'):
@@ -25,5 +28,10 @@ def connect():
                      'linear_aceleration': 0, 'angular_aceleration': 0}
         sio.emit('/drive_cmd', drive_msg)
         sleep(0.01)
+
+@sio.event
+def disconnect():
+    print("Disconnected")
+    exit = True
 
 sio.connect('http://localhost:3000')
