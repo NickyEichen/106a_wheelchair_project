@@ -6,24 +6,24 @@ sio = socketio.Client()
 
 @sio.event
 def connect():
-    x,y,z = -4,1,0
-    qx, qy, qz, qw = 1,1,1,0
+    x,y,z = -1,1,0
+    qx, qy, qz, qw = 1,0,0,0
     transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
     waypoint = dict(timestamp=0.0, transforms=transforms)
     sio.emit('/path', waypoint)
     sleep(5)
-    x,y,z = 0,0,0
-    qx, qy, qz, qw = 0,0,0,0
-    transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
-    waypoint = dict(timestamp=1.0, transforms=transforms)
-    sio.emit('/path', waypoint)
-    sleep(5)
-    x,y,z = -2,2,0
-    qx, qy, qz, qw = 0,0,0,0
-    transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
-    waypoint = dict(timestamp=2.0, transforms=transforms)
-    sio.emit('/path', waypoint)
-    sleep(5)
+    # x,y,z = 0,0,0
+    # qx, qy, qz, qw = 0,0,0,0
+    # transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
+    # waypoint = dict(timestamp=1.0, transforms=transforms)
+    # sio.emit('/path', waypoint)
+    # sleep(5)
+    # x,y,z = -2,2,0
+    # qx, qy, qz, qw = 0,0,0,0
+    # transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
+    # waypoint = dict(timestamp=2.0, transforms=transforms)
+    # sio.emit('/path', waypoint)
+    # sleep(5)
     
     print('Connected successfully')
 
