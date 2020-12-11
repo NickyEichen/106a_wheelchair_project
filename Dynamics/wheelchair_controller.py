@@ -1,4 +1,4 @@
-
+import pure_pursuit
 import wheelchair_math as WC_Math
 import math
 
@@ -8,8 +8,6 @@ class WheelchairController:
         # Driver Control Coefficients
         self._velcontrol_lin_Kv = -0.4
         self._velcontrol_ang_Kv = -0.4
-        #self._velcontrol_lin_Kd = -0.5
-        #self._velcontrol_ang_Kd = -0.5
 
         self._max_linear_vel = 10
         self._max_angular_vel = 10
@@ -23,8 +21,6 @@ class WheelchairController:
         self._right_castor_angle = math.pi*3/2
         self._linear_velocity = 0
         self._angular_velocity = 0
-        self._virtual_linear_position = 0
-        self._virtual_angular_position = 0
 
         #Not currently used, but might be useful if we want to add features.
         self._dynamic_states = {}
@@ -85,3 +81,10 @@ class WheelchairController:
 
     def calc_speed(self, left_speed, right_speed):
         return WC_Math.calc_velocities(left_speed, right_speed)
+
+
+    def pursue(self, traj, pos, ang):
+        return pure_pursuit.find_vels(traj, pos, ang, 0.4)
+
+    def pursuit_is_done(self, traj, pos):
+        return pure_pursuit.is_done(traj, pos, 0.5)
