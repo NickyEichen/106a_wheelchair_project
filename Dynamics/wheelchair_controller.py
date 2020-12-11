@@ -84,7 +84,7 @@ class WheelchairController:
 
 
     def pursue(self, traj, pos, ang):
-        return pure_pursuit.find_vels(traj, pos, ang, 0.4)
+        return pure_pursuit.proportional_follow(traj, pos, ang, 1)
 
     def pursuit_is_done(self, traj, pos):
         return pure_pursuit.is_done(traj, pos, 0.5)

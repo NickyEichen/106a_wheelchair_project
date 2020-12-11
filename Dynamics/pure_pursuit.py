@@ -63,7 +63,7 @@ def find_vels(traj, pos, ang, lookahead_dist):
     vel, ang = traj[cst][2], traj[cst][2] * c
     return vel, ang
 
-def bang_bang(traj, pos, ang, coef):
+def proportional_follow(traj, pos, ang, coef):
     cst = get_closest(traj, pos)
     x, y, t_ind = lookahead(traj, pos, 0.6)
 
