@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 # so points will be [[x,y, exit angle],[x,y, exit angle],[x,y, exit angle]] etc.
 # need to install pip3 install 'pybind11>=2.2'
 # pip3 install robotpy-pathfinder
-# pip 3install -U matplotlib
+# pip3 install -U matplotlib
 
 
 def createPoints(points):
