@@ -95,17 +95,6 @@ def set4():
     waypoint = dict(timestamp=2.0, transforms=transforms)
     sio.emit('/path', waypoint)
     # sleep(5)
-    x,y,z = 3,-8,0
-    qx, qy, qz, qw = 0,0,0,0
-    transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
-    waypoint = dict(timestamp=3.0, transforms=transforms)
-    sio.emit('/path', waypoint)
-    # sleep(5)
-    x,y,z = 3,8,0
-    qx, qy, qz, qw = 0,0,0,0
-    transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
-    waypoint = dict(timestamp=4.0, transforms=transforms)
-    sio.emit('/path', waypoint)
-    # sleep(5)
+
 
 

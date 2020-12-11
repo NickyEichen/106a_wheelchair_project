@@ -10,8 +10,11 @@ from pathFunc import *
 #     pf.Waypoint(-4, -1, math.radians(-45.0)),   # Waypoint @ x=-4, y=-1, exit angle=-45 degrees
 #     pf.Waypoint(-2, -2, 0),                     # Waypoint @ x=-2, y=-2, exit angle=0 radians
 #     pf.Waypoint(0, 0, 0),                       # Waypoint @ x=0, y=0,   exit angle=0 radians
-# ]
-points = [pf.Waypoint(-6, -5, 0), pf.Waypoint(-2, -3, 0), pf.Waypoint(0, 0, 0), pf.Waypoint(2, 3, 0)]
+# # ]
+# points = [pf.Waypoint(-4, 1, 0), pf.Waypoint(-2, -2, 0), pf.Waypoint(0, 0, 0)]
+# points = [pf.Waypoint(-6, -5, 0), pf.Waypoint(-2, -3, 0), pf.Waypoint(0, 0, 0), pf.Waypoint(2, 3, 0)]
+# points = [pf.Waypoint(-6, -5, 0),pf.Waypoint(-2, -3, 0), pf.Waypoint(1, 2, 0), pf.Waypoint(2, 3, 0), pf.Waypoint(3, 8, 0)]
+points = [pf.Waypoint(-2, -1, 0),pf.Waypoint(0, -5, 0), pf.Waypoint(1, -7, 0)]
 # info, trajectory = pf.generate(points, pf.FIT_HERMITE_CUBIC, pf.SAMPLES_HIGH, dt=0.05,max_velocity=1.7,max_acceleration=2.0,max_jerk=60.0)
 
 
