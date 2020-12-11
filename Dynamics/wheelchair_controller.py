@@ -8,6 +8,8 @@ class WheelchairController:
         # Driver Control Coefficients
         self._velcontrol_lin_Kv = -0.4
         self._velcontrol_ang_Kv = -0.4
+        #self._velcontrol_lin_Kd = -0.5
+        #self._velcontrol_ang_Kd = -0.5
 
         self._max_linear_vel = 10
         self._max_angular_vel = 10
@@ -21,6 +23,8 @@ class WheelchairController:
         self._right_castor_angle = math.pi*3/2
         self._linear_velocity = 0
         self._angular_velocity = 0
+        self._virtual_linear_position = 0
+        self._virtual_angular_position = 0
 
         #Not currently used, but might be useful if we want to add features.
         self._dynamic_states = {}
@@ -49,7 +53,11 @@ class WheelchairController:
         Performs proportional computed torque control to match.
         Limits maximum acceleration and maximum velocity for safety of the riders.
         """
+        lin_acel, ang_acel = self.calc_acels(linear_vel, angular_vel, linear_acel, angular_acel)
+        # Convert acelerations into torques
+        return self.calc_torques(lin_acel, ang_acel)
 
+    def calc_acels(self, linear_vel, angular_vel, linear_acel, angular_acel):
         # Calculate linear acceleration, with proper limits
         if abs(self._linear_velocity) < self._max_linear_vel:
             lin_acel = linear_acel + (self._linear_velocity - linear_vel) * self._velcontrol_lin_Kv
@@ -64,9 +72,16 @@ class WheelchairController:
         else:
             ang_acel = 0
 
-        # Convert acelerations into torques
-        print("Acelerations: %.2f, %.2f" %(lin_acel, ang_acel))
-        return self.calc_torques(lin_acel, ang_acel)
+        return lin_acel, ang_acel
+
+    def calc_simplified_torques(self, linear_acel, angular_acel):
+        T1, T2 = WC_Math.calc_simplified(self._roll, self._pitch, self._left_castor_angle, self._right_castor_angle,
+                            self._linear_velocity, linear_acel, self._angular_velocity, angular_acel)
+        return T1, T2
+
+    def simplified_velocity_control(self, linear_vel, angular_vel, linear_acel, angular_acel):
+        lin, ang = self.calc_acels(linear_vel, angular_vel, linear_acel, angular_acel)
+        return self.calc_simplified_torques(lin, ang)
 
     def calc_speed(self, left_speed, right_speed):
         return WC_Math.calc_velocities(left_speed, right_speed)

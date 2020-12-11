@@ -70,9 +70,10 @@ def on_drive_cmd(data):
 
     calculate_velocities()
     robot.update_states(states)
-    left, right = robot.velocity_control(lin_vel, ang_vel, lin_acel, ang_acel)
+    #left, right = robot.velocity_control(lin_vel, ang_vel, lin_acel, ang_acel)
+    left, right = robot.simplified_velocity_control(lin_vel, ang_vel, lin_acel, ang_acel)
     sio.emit("/set_torques", [left, right])
-    print("Castor L: % .2f, Castor R: % .2f  (deg)| Vel: % .2f, % .2f | wheel vels: % .2f, % .2f m/s| Torque: % .2f, % .2f (Nm)"
-    %(states['left_castor_angle']*180/pi, states['right_castor_angle']*180/pi, states['linear_velocity'], states['angular_velocity'], wheels[0], wheels[1], left, right))
+    print("Castor L: % .2f, Castor R: % .2f  (deg)| Vel: % .2f (m/s), % .2f (rad/s)|Target Vel: % .2f (m/s), % .2f (rad/s) | Torque: % .2f, % .2f (Nm)"
+          %(states['left_castor_angle']*180/pi, states['right_castor_angle']*180/pi, states['linear_velocity'], states['angular_velocity'],lin_vel, ang_vel, left, right))
 
 sio.connect('http://localhost:3000')

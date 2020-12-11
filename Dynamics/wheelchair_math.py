@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import cos, sin, sqrt, array, pi
+import math
 
 # Default values
 # Origin refers to midpoint between the two drive wheels
@@ -18,19 +19,7 @@ Izz = 22 # Taken from mesh model and scaled to match total mass. (N*m^2)
 
 O_x, O_y, O_z = 0.00176, -0.18841, 0.21625 # (m) Values taken from COM of mesh body in Unreal
 
-epsilon = 0.02
-
-#simplified version to demo driving in straight lines
-def calc_simplified(roll, pitch, theta_3, theta_4, v, v_dot, omega, omega_dot):
-    castor_drive_fric = 20
-    castor_rot_fric = 100
-
-    t3 = theta_3 - 3*pi/2
-    t4 = theta_4 - 3*pi/2
-
-
-
-    return torque_1, torque_2
+epsilon = 0.035
 
 def calc(roll, pitch, theta_3, theta_4, v, v_dot, omega, omega_dot, a=a, b=b, c=c, r_c=r_c, r_dw=r_dw, m=m, n=n, epsilon=epsilon, mu_rc=mu_rc, mu_rd=mu_rd, mu_tau=mu_tau,
          O_x=O_x, o_y = O_y, O_z = O_z, I=Izz):
@@ -74,7 +63,7 @@ def calc_velocities(left_wheel_speed, right_wheel_speed):
     return lin_vel, ang_vel
 
 def calcsimp(v, vdot, o, odot, t3=1.5, t4=1.5):
-    return calc(0, 0, t3*np.pi, t4*np.pi, v, vdot, o, odot)
+    return calc_simplified(0, 0, t3*np.pi, t4*np.pi, v, vdot, o, odot)
 
 def set_a(x):
     a = x
@@ -102,3 +91,86 @@ def set_COM(x, y, z):
     O_z = z
 def set_epsilon(x):
     epsilon = x
+
+
+#simplified version to demo driving in straight lines
+def calc_simplified(roll, pitch, theta_3, theta_4, v, v_dot, omega, omega_dot):
+
+    castor_drive_fric = 20
+    castor_rot_fric = 240
+    t_look_ahead = 1.5
+
+    vel_thresh = 0.2
+    omega_thresh = 0.2
+
+    v_future = v + v_dot*(t_look_ahead**2) /2
+    omega_future = omega + omega_dot*(t_look_ahead**2) /2
+
+    if (abs(v_future) > vel_thresh  or abs(omega_future) > omega_thresh):
+        t3_ideal = math.atan2(v_future - a*omega_future, b*omega_future)
+        t4_ideal = math.atan2(v_future + a*omega_future, b*omega_future)
+    else:
+        #print("v_future: % .2f, omega_future: % .2f" %(v_future, omega_future))
+        return (0, 0)
+    t3_ideal = rad_norm(t3_ideal + pi)
+    t4_ideal = rad_norm(t4_ideal + pi)
+
+    #print("Ideal thetas: ", t3_ideal*180/pi, t4_ideal*180/pi)
+
+    T = omega_dot * Izz
+    F = v_dot * m
+    er3 = rad_norm(t3_ideal - theta_3)
+    if (er3 < -epsilon):
+        c_val = cos(theta_3 - pi/2)
+        s_val = sin(theta_3 - pi/2)
+        T -= castor_rot_fric * (c_val*b - s_val*a)
+        F -= castor_rot_fric * s_val
+    elif er3 > epsilon:
+        c_val = cos(theta_3 + pi/2)
+        s_val = sin(theta_3 + pi/2)
+        T -= castor_rot_fric * (c_val*b - s_val*a)
+        F -= castor_rot_fric * s_val
+    if abs(er3) < pi/2:
+        c_val = cos(theta_3)
+        s_val = sin(theta_3)
+        T -= castor_drive_fric * (c_val*b - s_val*a)
+        F -= castor_drive_fric * s_val
+    else:
+        c_val = cos(theta_3)
+        s_val = sin(theta_3)
+        T += castor_drive_fric * (c_val*b - s_val*a)
+        F += castor_drive_fric * s_val
+
+    er4 = rad_norm(t4_ideal - theta_4)
+    if (er4< -epsilon):
+        c_val = cos(theta_4 - pi/2)
+        s_val = sin(theta_4 - pi/2)
+        T -= castor_rot_fric * (c_val*b + s_val*a)
+        F -= castor_rot_fric * s_val
+    elif er3 > epsilon:
+        c_val =  cos(theta_4 + pi/2)
+        s_val = sin(theta_4 + pi/2)
+        T -= castor_rot_fric * (c_val*b + s_val*a)
+        F -= castor_rot_fric * s_val
+    if abs(er4) < pi/2:
+        c_val = cos(theta_4)
+        s_val = sin(theta_4)
+        T -= castor_drive_fric * (c_val*b + s_val*a)
+        F -= castor_drive_fric * s_val
+    else:
+        c_val = cos(theta_4)
+        s_val = sin(theta_4)
+        T += castor_drive_fric * (c_val*b - s_val*a)
+        F += castor_drive_fric * s_val
+    #print("Foward force: %.3f, Turning Torque: %.3f" %(F, T))
+
+    torque_1 = (F - T/c) * r_dw
+    torque_2 = (F + T/c) * r_dw
+    return torque_1, torque_2
+
+def rad_norm(n):
+    if n > pi:
+        return rad_norm(n - 2*pi)
+    elif n < -pi:
+        return rad_norm(n + 2*pi)
+    return n

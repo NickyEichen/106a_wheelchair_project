@@ -5,7 +5,7 @@ from time import sleep
 sio = socketio.Client()
 
 v = 5
-t = 3
+t = -3
 
 exit = False
 
