@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 # so points will be [[x,y, exit angle],[x,y, exit angle],[x,y, exit angle]] etc.
 # need to install pip3 install 'pybind11>=2.2'
 # pip3 install robotpy-pathfinder
-# pip 3install -U matplotlib
+# pip3 install -U matplotlib
 
 
 def createPoints(points):
@@ -36,7 +36,8 @@ def plot(points, trajectory):
     # plot the waypoints
     mx, my = zip(*[(m.y, m.x) for m in points])
     plt.scatter(mx, my, c="r")
-
+    for i in np.arange(len(mx)):
+        plt.annotate(str(mx[i]) + ', '+ str(my[i]), xy = (mx[i], my[i]))
     # plot the trajectory
     x, y = zip(*[(seg.y, seg.x) for seg in trajectory])
     plt.plot(x, y)
