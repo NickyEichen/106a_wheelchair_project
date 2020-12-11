@@ -5,6 +5,7 @@ import math
 import numpy as np
 from pathFunc import *
 
+#change these points and run file
 points = [
     pf.Waypoint(-4, -1, math.radians(-45.0)),   # Waypoint @ x=-4, y=-1, exit angle=-45 degrees
     pf.Waypoint(-2, -2, 0),                     # Waypoint @ x=-2, y=-2, exit angle=0 radians
