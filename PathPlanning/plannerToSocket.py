@@ -1,49 +1,16 @@
 import socketio
 from pathFunc import *
 from time import sleep
+from testfunc import *
 
 sio = socketio.Client()
 
 @sio.event
 def connect():
-    x,y,z = -1,1,0
-    qx, qy, qz, qw = 1,0,0,0
-    transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
-    waypoint = dict(timestamp=0.0, transforms=transforms)
-    sio.emit('/path', waypoint)
-    sleep(5)
-    x,y,z = 0,0,0
-    qx, qy, qz, qw = 0,0,0,0
-    transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
-    waypoint = dict(timestamp=1.0, transforms=transforms)
-    sio.emit('/path', waypoint)
-    sleep(5)
-    x,y,z = -2,2,0
-    qx, qy, qz, qw = 0,0,0,0
-    transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
-    waypoint = dict(timestamp=2.0, transforms=transforms)
-    sio.emit('/path', waypoint)
-    sleep(5)
-
-    x,y,z = -10,1,0
-    qx, qy, qz, qw = 1,0,0,0
-    transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
-    waypoint = dict(timestamp=0.0, transforms=transforms)
-    sio.emit('/path', waypoint)
-    sleep(5)
-    x,y,z = 20,0,0
-    qx, qy, qz, qw = 0,0,0,0
-    transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
-    waypoint = dict(timestamp=1.0, transforms=transforms)
-    sio.emit('/path', waypoint)
-    sleep(5)
-    x,y,z = -15,2,0
-    qx, qy, qz, qw = 0,0,0,0
-    transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
-    waypoint = dict(timestamp=2.0, transforms=transforms)
-    sio.emit('/path', waypoint)
-    sleep(5)
-    
+    set1()
+    # set2()
+    # set3()
+    # set4()
     print('Connected successfully')
 
 # #need to figure out how to recieve waypoints, computer vision aspect and how we comunicate those inputs on socket.io
