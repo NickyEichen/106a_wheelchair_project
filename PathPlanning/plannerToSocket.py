@@ -24,6 +24,25 @@ def connect():
     waypoint = dict(timestamp=2.0, transforms=transforms)
     sio.emit('/path', waypoint)
     sleep(5)
+
+    x,y,z = -10,1,0
+    qx, qy, qz, qw = 1,0,0,0
+    transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
+    waypoint = dict(timestamp=0.0, transforms=transforms)
+    sio.emit('/path', waypoint)
+    sleep(5)
+    x,y,z = 20,0,0
+    qx, qy, qz, qw = 0,0,0,0
+    transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
+    waypoint = dict(timestamp=1.0, transforms=transforms)
+    sio.emit('/path', waypoint)
+    sleep(5)
+    x,y,z = -15,2,0
+    qx, qy, qz, qw = 0,0,0,0
+    transforms = dict(location=[x, y, z], rotation=[qx, qy, qz, qw])
+    waypoint = dict(timestamp=2.0, transforms=transforms)
+    sio.emit('/path', waypoint)
+    sleep(5)
     
     print('Connected successfully')
 
@@ -43,7 +62,7 @@ def pathPlan(data):
     right, left = rightLeft(trajectory)
     parse = []
     for seg in trajectory:
-        parse.append([seg.x, seg.y, seg.position, seg.velocity, seg.acceleration])
+        parse.append([seg.x, seg.y, seg.velocity])
     #need to figure out where to put this or emit to, probably should go to controller, right
     #right/left list of these <Segment dt=0.050000 x=-4.174969 y=-1.178583 position=0.002500 velocity=0.100000 acceleration=2.000000 jerk=40.000000 heading=5.498103>
     #this is how right and left look, large list of these
