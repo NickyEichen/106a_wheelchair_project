@@ -44,7 +44,7 @@ def right_wheel(data):
 
 #need to figure out how to recieve waypoints, computer vision aspect and how we comunicate those inputs on socket.io
 
-@sio.on('whatever the topic name for visualization') #is this supposed to be an event? Maybe we can call this function when computer vision is done
+@sio.on('/drive_cmd') #is this supposed to be an event? Maybe we can call this function when computer vision is done
 def pathPlan(data):
     #insert data reorganization here for functions
     new_data = ...
@@ -59,6 +59,9 @@ def pathPlan(data):
     #need to figure out where to put this or emit to, probably should go to controller, right
     #right/left list of these <Segment dt=0.050000 x=-4.174969 y=-1.178583 position=0.002500 velocity=0.100000 acceleration=2.000000 jerk=40.000000 heading=5.498103>
     #this is how right and left look, large list of these
-    sio.emit('topicname')
+    sio.emit('/trajectory', trajectory)
 
+@sio.event
+def setWay(waypoints):
+    sio.emit('/path', waypoints)
 sio.connect('http://localhost:3000')
