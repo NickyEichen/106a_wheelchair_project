@@ -12,7 +12,7 @@
 
 3. Copy the `Config/`, `Content/`, `Plugins/` folders from Permobil's simulation zip into the project directory. This overwrites `DefaultEngine.ini`
 
-4. Copy the `Content/`, `Plugins/` folders from `hubert/` into the project directory. This overwrites two files.
+4. Copy the `Content/`, `Plugins/` folders from `SocketIO/` into the project directory. This overwrites two files.
 
 5. Reopen the UE4 project. It will build the new files. If this fails try installing .NET Framework Developer Pack https://dotnet.microsoft.com/download/visual-studio-sdks
 
@@ -20,7 +20,7 @@
 
 7. Drag a `Content/Blueprints/F5-Complete` and a `roshi Content/DataCollector/BP_CaptureActor` into the scene. Set the `Physics Actor` attribute of the `BP_CaptureActor` to the `F5-Complete` under Details to the right.
 
-8. Install Node.js and run `server.js`. If you don't have the socketio dependency install npm package manager and run `npm install` in the command line in the `hubert/` directory.
+8. Install Node.js and run `server.js`. If you don't have the socketio dependency install npm package manager and run `npm install` in the command line in the `SocketIO/` directory.
 
 9. Run the UE4 simulation.
 
