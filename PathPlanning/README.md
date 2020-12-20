@@ -1,0 +1,7 @@
+## how to use path planner
+pathFunc.py holds the main function for path planning and plotting the trajectories
+1. Determine at least two waypoints and at maximum 5. Additionally, determine the heading or the angle in which the robot should pass through the waypoints. This could dramatically change the shape of the trajectory.
+2. Create pts for use in the functions. Points consist of the waypoints and are of the shape [[x1, y1 angle1], [x2, y2, angle2]] Use the function createPoints
+3. Once you have the points call createPath. This pathplanner works by fitting a polynomial through the points specified but also may not find a path if given impossible headings.  Additionally, depending on the specs of your robot you can change the arguments "max_vel, max_accel, max_jerk, dt". Currently, they are set to max_vel = 1.7, max_accel = 2.0, max_jerk = 60.0, dt = 0.05. The path function returns the info which specifies how many waypoints and essentially the arguments given. Also, it specifies the trajectory which comes as segments "<Segment dt=0.050000 x=-4.174969 y=-1.178583 position=0.002500 velocity=0.100000 acceleration=2.000000 jerk=40.000000 heading=5.498103>"
+4. From the trajectory, you can choose to split up the long list of segments into right wheel path and left wheel paths using the rightLeft function. 
+5. You may also want to plot your trajectories which can be plotted using the plot function.
